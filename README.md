@@ -1,5 +1,7 @@
 # Annotation Laroute
 
+Using PHP 8 attributes to automatically generate routes in order to streamline Laravel routing, enhancing developer productivity while maintaining full compatibility with Laravel's routing functionality.
+
 [![GitHub Tag](https://img.shields.io/github/v/tag/dependencies-packagist/laroute)](https://github.com/dependencies-packagist/laroute/tags)
 [![Total Downloads](https://img.shields.io/packagist/dt/annotation/laroute?style=flat-square)](https://packagist.org/packages/annotation/laroute)
 [![Packagist Version](https://img.shields.io/packagist/v/annotation/laroute)](https://packagist.org/packages/annotation/laroute)
