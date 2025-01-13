@@ -15,6 +15,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Namespace Configurations
+    |--------------------------------------------------------------------------
+    |
+    | Get the application namespace.
+    |
+    */
+
+    'root_namespace' => env('LAROUTE_ROOT_NAMESPACE'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Root Path Configurations
+    |--------------------------------------------------------------------------
+    |
+    | Get the base path of the Laravel installation.
+    |
+    */
+
+    'root_path' => env('LAROUTE_ROOT_PATH'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Directories Configurations
     |--------------------------------------------------------------------------
     |
@@ -27,28 +49,39 @@ return [
 
     'directories' => [
         app_path('Http/Controllers'),
-        app_path('Http/Controllers/Backend') => [
-            'domain' => config('routing.domains.backend'),
-            'prefix' => 'backend',
-            'as' => 'backend.',
-            'middleware' => 'web',
-            // Only routes matching the pattern in the file are registered
-            'only' => ['*Controller.php'],
-            // Except routes from registration pattern matching file
-            'except' => [],
-        ],
-        app_path('Http/Controllers/Enterprise') => [
-            'domain' => config('routing.domains.enterprise'),
-            'prefix' => 'enterprise',
-            'as' => 'enterprise.',
-            'middleware' => [
-                'web',
-            ],
-            // Only routes matching the pattern in the file are registered
-            'only' => ['*Controller.php'],
-            // Except routes from registration pattern matching file
-            'except' => [],
-        ],
+        //app_path('Http/Controllers/Backend') => [
+        //    'domain' => config('routing.domains.backend'),
+        //    'prefix' => 'backend',
+        //    'as' => 'backend.',
+        //    'middleware' => 'web',
+        //    // Only routes matching the pattern in the file are registered
+        //    'only' => ['*Controller.php'],
+        //    // Except routes from registration pattern matching file
+        //    'except' => [],
+        //],
+        //app_path('Http/Controllers/Enterprise') => [[
+        //    'domain' => config('routing.domains.enterprise'),
+        //    'prefix' => 'enterprise',
+        //    'as' => 'enterprise.',
+        //    'middleware' => [
+        //        'web',
+        //    ],
+        //    // Only routes matching the pattern in the file are registered
+        //    'only' => ['*Controller.php'],
+        //    // Except routes from registration pattern matching file
+        //    'except' => [],
+        //], [
+        //    'domain' => config('routing.domains.enterprise'),
+        //    'prefix' => 'enterprise',
+        //    'as' => 'enterprise.',
+        //    'middleware' => [
+        //        'web',
+        //    ],
+        //    // Only routes matching the pattern in the file are registered
+        //    'only' => ['*Controller.php'],
+        //    // Except routes from registration pattern matching file
+        //    'except' => [],
+        //]],
     ],
 
 
@@ -97,5 +130,23 @@ return [
     */
 
     'scope-bindings' => env('LAROUTE_SCOPE_BINDINGS'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Aliases Configurations
+    |--------------------------------------------------------------------------
+    |
+    | Aliases of Action in gateWay Mode
+    |
+    */
+
+    'alias' => [
+        '1.0.0' => [
+            'ping' => 'utils.ping.pong',
+        ],
+        '2.0.0' => [
+            'ping' => 'utils.ping.pong.v2',
+        ],
+    ],
 
 ];
