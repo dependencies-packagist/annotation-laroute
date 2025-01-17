@@ -20,13 +20,15 @@ class RoutingServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/routing.php', 'routing');
 
         $this->app->singleton(RouteRegistrarContract::class, function ($app) {
-            return new RouteRegistrar(
+            return tap(new RouteRegistrar(
                 router: $app['router'],
                 rootNamespace: $this->getRouteRootNamespace(),
                 rootPath: $this->getRouteRootPath(),
-                directories: $this->getRouteDirectories(),
-                middleware: $this->getRouteMiddleware(),
-            );
+            ), function (RouteRegistrar $route) {
+                $route
+                    ->setDirectories($this->getRouteDirectories())
+                    ->setMiddleware($this->getRouteMiddleware());
+            });
         });
         $this->app->singleton(PendingRouteContract::class, function ($app) {
             return new PendingRoute($app->make(RouteRegistrarContract::class));
