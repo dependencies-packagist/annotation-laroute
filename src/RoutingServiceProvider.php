@@ -54,22 +54,22 @@ class RoutingServiceProvider extends ServiceProvider
 
     private function getRouteDirectories(): array
     {
-        return config('routing.directories') ?? [];
+        return config('routing.directories') ?: [];
     }
 
     private function getRouteMiddleware(): array
     {
-        return config('routing.middleware') ?? [];
+        return config('routing.middleware') ?: [];
     }
 
     private function getRouteRootNamespace(): string
     {
-        return config('routing.root_namespace') ?? $this->app->getNamespace();
+        return config('routing.root_namespace') ?: $this->app->getNamespace();
     }
 
     private function getRouteRootPath(): string
     {
-        return config('routing.root_path') ?? $this->app->path();
+        return config('routing.root_path') ?: $this->app->path();
     }
 
 }
