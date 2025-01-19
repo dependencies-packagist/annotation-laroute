@@ -4,6 +4,7 @@ namespace Annotation\Routing;
 
 use Annotation\Routing\Contracts\PendingRouteContract;
 use Annotation\Routing\Contracts\RouteRegistrarContract;
+use Illuminate\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use ReflectionException;
@@ -21,7 +22,7 @@ class RoutingServiceProvider extends ServiceProvider
 
         $this->app->singleton(RouteRegistrarContract::class, function ($app) {
             return tap(new RouteRegistrar(
-                router: $app['router'],
+                application: $app,
                 rootNamespace: $this->getRouteRootNamespace(),
                 rootPath: $this->getRouteRootPath(),
             ), function (RouteRegistrar $route) {
@@ -44,6 +45,7 @@ class RoutingServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Router::mixin(new \Annotation\Routing\Router);
+        Application::mixin(new \Annotation\Routing\Application);
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
