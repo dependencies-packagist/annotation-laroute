@@ -1,12 +1,13 @@
 <?php
 
-namespace Annotation\Routing\Contracts;
+namespace Annotation\Routing\Attributes\Contracts;
 
 use Rfc\Request\RequestMethods;
 
 interface RouteAttributeContract extends RequestMethods
 {
-    public const GET = ['GET', 'HEAD'];
+    public const GET    = ['GET', 'HEAD'];
+    public const UPDATE = ['PUT', 'PATCH'];
     /**
      * All the verbs supported by the router.
      *
