@@ -2,14 +2,12 @@
 
 namespace Annotation\Routing\Attributes;
 
-use Annotation\Routing\Contracts\RouteAttributeContract;
 use Attribute;
 use Closure;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
-class Route implements RouteAttributeContract
+class Route implements Contracts\RouteAttributeContract
 {
-    protected array $names    = [];
     protected bool  $fallback = false;
 
     public function __construct(
