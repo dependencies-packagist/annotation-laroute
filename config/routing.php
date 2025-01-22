@@ -48,43 +48,43 @@ return [
     */
 
     'directories' => [
-        // app_path('Http/Controllers/Backend'),
-        app_path('Http/Controllers/Backend')    => [
-            'domain'     => env('LAROUTE_DOMAINS_BACKEND', 'backend.lvh.me'),
-            'prefix'     => 'backend',
-            'as'         => 'backend.',
-            'middleware' => 'web',
-            // Only routes matching the pattern in the file are registered
-            'only'       => ['*Controller.php'],
-            // Except routes from registration pattern matching file
-            'except'     => [],
-        ],
-        app_path('Http/Controllers/Enterprise') => [
-            [
-                'domain'     => env('LAROUTE_DOMAINS_ENTERPRISE', 'enterprise.lvh.me'),
-                'prefix'     => 'enterprise',
-                'as'         => 'enterprise.',
-                'middleware' => [
-                    'web',
-                    'auth',
-                ],
-                // Only routes matching the pattern in the file are registered
-                'only'       => ['*Controller.php'],
-                // Except routes from registration pattern matching file
-                'except'     => ['AccountController.php'],
-            ], [
-                'domain'     => env('LAROUTE_DOMAINS_ENTERPRISE', 'enterprise.lvh.me'),
-                'prefix'     => 'enterprise',
-                'as'         => 'enterprise.',
-                'middleware' => [
-                    'web',
-                ],
-                // Only routes matching the pattern in the file are registered
-                'only'       => ['AccountController.php'],
-                // Except routes from registration pattern matching file
-                'except'     => [],
-            ],
-        ],
+        app_path('Http/Controllers/Backend'),
+        // app_path('Http/Controllers/Backend')    => [
+        //     'domain'     => env('LAROUTE_DOMAINS_BACKEND', 'backend.lvh.me'),
+        //     'prefix'     => 'backend',
+        //     'as'         => 'backend.',
+        //     'middleware' => 'web',
+        //     // Only routes matching the pattern in the file are registered
+        //     'only'       => ['*Controller.php'],
+        //     // Except routes from registration pattern matching file
+        //     'except'     => [],
+        // ],
+        // app_path('Http/Controllers/Enterprise') => [
+        //     [
+        //         'domain'     => env('LAROUTE_DOMAINS_ENTERPRISE', 'enterprise.lvh.me'),
+        //         'prefix'     => 'enterprise',
+        //         'as'         => 'enterprise.',
+        //         'middleware' => [
+        //             'web',
+        //             'auth',
+        //         ],
+        //         // Only routes matching the pattern in the file are registered
+        //         'only'       => ['*Controller.php'],
+        //         // Except routes from registration pattern matching file
+        //         'except'     => ['AccountController.php'],
+        //     ], [
+        //         'domain'     => env('LAROUTE_DOMAINS_ENTERPRISE', 'enterprise.lvh.me'),
+        //         'prefix'     => 'enterprise',
+        //         'as'         => 'enterprise.',
+        //         'middleware' => [
+        //             'web',
+        //         ],
+        //         // Only routes matching the pattern in the file are registered
+        //         'only'       => ['AccountController.php'],
+        //         // Except routes from registration pattern matching file
+        //         'except'     => [],
+        //     ],
+        // ],
     ],
 
 
