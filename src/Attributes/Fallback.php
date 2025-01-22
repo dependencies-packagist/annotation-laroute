@@ -9,9 +9,10 @@ use Attribute;
 class Fallback extends Route implements Contracts\RouteFallbackAttributeContract
 {
     public function __construct(
-        string|null                $name = null,
+        string|null                $name = 'fallback',
         string|null                $action = null,
         string|null                $controller = null,
+        string|null                $namespace = null,
         InvokeContract|string|null $uses = null,
         string|null                $prefix = null,
         string|null                $domain = null,
@@ -31,6 +32,7 @@ class Fallback extends Route implements Contracts\RouteFallbackAttributeContract
             uri: '{fallbackPlaceholder}',
             action: $action,
             controller: $controller,
+            namespace: $namespace,
             uses: $uses,
             prefix: $prefix,
             domain: $domain,
