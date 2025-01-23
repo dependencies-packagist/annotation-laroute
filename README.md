@@ -126,6 +126,20 @@ Route::gateWay('gateway.do', function (Request $request) {
 
 > Specify the route to obtain the version source
 
+### Command Support
+
+```php
+php artisan route.scan:cache
+```
+
+> Create a scanned route cache file for faster route registration
+
+```php
+php artisan route.scan:clear
+```
+
+> Remove the scanned route cache file
+
 ## License
 
 Nacosvel Contracts is made available under the MIT License (MIT). Please see [License File](LICENSE) for more information.
