@@ -2,17 +2,21 @@
 
 namespace Annotation\Routing\Facades;
 
+use Annotation\Routing\Contracts\GateWayRouteContract;
 use Annotation\Routing\Contracts\PendingRouteContract;
+use Annotation\Routing\GateWayRoute;
 use Annotation\Routing\PendingRoute;
 use Closure;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static PendingRoute discover()
- * @method static PendingRoute gateWay(string $endpoint = 'gateway.do', Closure $action = null, Closure $version = null)
+ * @method static PendingRoute discover(Closure $callback = null)
+ * @method static \Illuminate\Routing\Route gateWay(string $endpoint = 'gateway.do', Closure $action = null, Closure $version = null)
  *
  * @see PendingRouteContract
  * @see PendingRoute
+ * @see GateWayRouteContract
+ * @see GateWayRoute
  */
 class Route extends Facade
 {

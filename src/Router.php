@@ -16,8 +16,8 @@ class Router
      */
     public function discover(): Closure
     {
-        return function (): PendingRouteContract {
-            return app(PendingRouteContract::class)->discover();
+        return function (Closure $handle = null): PendingRouteContract {
+            return app(PendingRouteContract::class)->discover($handle);
         };
     }
 
