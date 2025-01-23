@@ -2,8 +2,10 @@
 
 namespace Annotation\Routing;
 
+use Annotation\Routing\Contracts\GateWayRouteContract;
 use Annotation\Routing\Contracts\PendingRouteContract;
 use Closure;
+use Illuminate\Routing\Route;
 
 class Router
 {
@@ -27,8 +29,8 @@ class Router
      */
     public function gateWay(): Closure
     {
-        return function (string $endpoint = 'gateway.do', Closure $action = null, Closure $version = null): PendingRouteContract {
-            return app(PendingRouteContract::class)->gateWay($endpoint, $action, $version);
+        return function (string $endpoint = 'gateway.do', Closure $action = null, Closure $version = null): Route {
+            return app(GateWayRouteContract::class)->gateWay($endpoint, $action, $version);
         };
     }
 

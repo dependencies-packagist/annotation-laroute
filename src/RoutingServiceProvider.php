@@ -2,6 +2,7 @@
 
 namespace Annotation\Routing;
 
+use Annotation\Routing\Contracts\GateWayRouteContract;
 use Annotation\Routing\Contracts\PendingRouteContract;
 use Annotation\Routing\Contracts\RouteRegistrarContract;
 use Illuminate\Foundation\Application;
@@ -33,6 +34,9 @@ class RoutingServiceProvider extends ServiceProvider
         });
         $this->app->singleton(PendingRouteContract::class, function ($app) {
             return new PendingRoute($app->make(RouteRegistrarContract::class));
+        });
+        $this->app->singleton(GateWayRouteContract::class, function () {
+            return new GateWayRoute();
         });
     }
 
