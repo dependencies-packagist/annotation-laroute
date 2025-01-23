@@ -52,9 +52,26 @@ abstract class ResourceAttribute extends Route implements Contracts\RouteResourc
         );
     }
 
-    public function getMethods(string $name)
+    /**
+     * @param string|null $name
+     *
+     * @return array
+     */
+    #[\Override]
+    public function getMethods(string $name = null): array
     {
         return $this->resource[$name] ?: [];
+    }
+
+    /**
+     * @param string|null $name
+     *
+     * @return string|null
+     */
+    #[\Override]
+    public function getName(string $name = null): ?string
+    {
+        return $this->names[$name] ?? $name;
     }
 
     public function getResourceMethods(): array
@@ -72,11 +89,6 @@ abstract class ResourceAttribute extends Route implements Contracts\RouteResourc
         }
 
         return array_values($methods);
-    }
-
-    public function getName(string $name)
-    {
-        return $this->names[$name] ?? $name;
     }
 
 }
