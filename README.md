@@ -20,13 +20,13 @@ composer require annotation/laroute
 
 ### Directories Configurations
 
-#### No Configuration
-
 ```php
 'directories' => [
     app_path('Http/Controllers/Backend'),
 ],
 ```
+
+> Only specify the scan path, no extended configuration information
 
 #### Basic Configuration
 
@@ -44,6 +44,8 @@ composer require annotation/laroute
      ],
 ],
 ```
+
+> More configurations of `domain`, `prefix`, `as`, and `middleware` can be specified
 
 #### Multiple Configurations
 
@@ -77,6 +79,8 @@ composer require annotation/laroute
      ],
 ],
 ```
+
+> The same path can specify multiple groups of configurations, suitable for scenarios such as `Auth` and `Guest` routing
 
 ### Route Discover
 
