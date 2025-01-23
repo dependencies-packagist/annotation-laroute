@@ -2,6 +2,8 @@
 
 namespace Annotation\Routing;
 
+use Annotation\Routing\Console\RouteCacheCommand;
+use Annotation\Routing\Console\RouteClearCommand;
 use Annotation\Routing\Contracts\GateWayRouteContract;
 use Annotation\Routing\Contracts\PendingRouteContract;
 use Annotation\Routing\Contracts\RouteRegistrarContract;
@@ -55,6 +57,10 @@ class RoutingServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../config/routing.php' => $this->app->configPath('routing.php'),
             ], 'routing');
+            $this->commands([
+                RouteCacheCommand::class,
+                RouteClearCommand::class,
+            ]);
         }
     }
 
