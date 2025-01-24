@@ -161,7 +161,9 @@ class Route implements Contracts\RouteAttributeContract
      */
     public function getWheres(): array
     {
-        return $this->wheres;
+        return array_map(function ($value) {
+            return is_array($value) ? explode('|', $value) : $value;
+        }, $this->wheres);
     }
 
     /**
