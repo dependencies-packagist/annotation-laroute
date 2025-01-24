@@ -3,6 +3,7 @@
 namespace Annotation\Routing;
 
 use Annotation\Routing\Contracts\RouteRegistrarContract;
+use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -29,9 +30,11 @@ class RouteRegistrar implements RouteRegistrarContract
     /**
      * Get Scanned Routes
      *
+     * @param Closure|null $callback
+     *
      * @return Collection
      */
-    public function getRoutes(): Collection
+    public function getRoutes(Closure $callback = null): Collection
     {
         return $this->directories->flatMap(function (array $directories) {
             ['path' => $path, 'options' => $options] = $directories;
@@ -43,6 +46,8 @@ class RouteRegistrar implements RouteRegistrarContract
                 return $finder->files()->in($path)->name($only)->notName($except)->sortByName();
             });
             return collect($files)->values()->flatMap(fn(SplFileInfo $file) => $this->resolving($file, $path, $attributes))->filter();
+        })->map($callback ?? function ($route) {
+            return $route;
         })->filter();
     }
 

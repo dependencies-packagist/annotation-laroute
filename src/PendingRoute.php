@@ -62,14 +62,14 @@ class PendingRoute implements PendingRouteContract
         return $this->pipe($callback)->handle(fn(array $options) => $this->sendThroughRouter($options));
     }
 
-    public function getRoutes(): Collection
+    public function getRoutes(Closure $callback = null): Collection
     {
-        return $this->route->getRoutes();
+        return $this->route->getRoutes($callback);
     }
 
     protected function handle(Closure $callback)
     {
-        return tap($this, fn() => $this->getRoutes()->map($callback));
+        return tap($this, fn() => $this->getRoutes($callback));
     }
 
     protected function sendThroughRouter(array $options)

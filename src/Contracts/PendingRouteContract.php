@@ -18,6 +18,6 @@ interface PendingRouteContract
 
     public function discover(Closure $callback = null): static;
 
-    public function getRoutes(): Collection;
+    public function getRoutes(Closure $callback = null): Collection;
 
 }

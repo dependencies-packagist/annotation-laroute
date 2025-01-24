@@ -2,6 +2,7 @@
 
 namespace Annotation\Routing\Contracts;
 
+use Closure;
 use Illuminate\Support\Collection;
 
 interface RouteRegistrarContract
@@ -9,9 +10,11 @@ interface RouteRegistrarContract
     /**
      * Get Scanned Routes
      *
+     * @param Closure|null $callback
+     *
      * @return Collection
      */
-    public function getRoutes(): Collection;
+    public function getRoutes(Closure $callback = null): Collection;
 
     /**
      * Get the scan routing path
