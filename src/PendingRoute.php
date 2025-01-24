@@ -7,6 +7,7 @@ use Annotation\Routing\Contracts\RouteRegistrarContract;
 use Closure;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 
 class PendingRoute implements PendingRouteContract
@@ -21,6 +22,12 @@ class PendingRoute implements PendingRouteContract
         $this->pipeline = new Pipeline;
     }
 
+    public function pipe(Closure $callback): static
+    {
+        $this->pipes[] = $callback;
+        return $this;
+    }
+
     public function discover(Closure $callback = null): static
     {
         if (app()->scannedRoutesAreCached()) {
@@ -29,22 +36,38 @@ class PendingRoute implements PendingRouteContract
             });
             return $this;
         }
-        $this->pipes[] = $callback;
-        $this->route->loadScannedRoutes()->getRoutes()
-            ->map(function (array $options, string $name) {
-                return $this->pipeline->send($options)
-                    ->through($this->pipes)
-                    ->then(function ($destination) use ($name) {
-                        return Route::match($destination['methods'], $destination['uri'], $destination['action']);
-                    });
-            });
-        return $this;
+
+        return $this->pipe($callback)->handle(fn(array $options) => $this->sendScannedThroughRouter($options));
     }
 
-    public function pipe(Closure $callback): static
+    public function getRoutes(): Collection
     {
-        $this->pipes[] = $callback;
-        return $this;
+        return $this->route->loadScannedRoutes()->getRoutes();
+    }
+
+    protected function handle(Closure $callback)
+    {
+        return tap($this, fn() => $this->getRoutes()->map($callback));
+    }
+
+    protected function sendScannedThroughRouter(array $options)
+    {
+        return $this->pipeline->send($options)
+            ->through($this->pipes)
+            ->then(function ($destination) {
+                return $this->registerRoute($destination);
+            });
+    }
+
+    protected function registerRoute(array $destination): \Illuminate\Routing\Route
+    {
+        $route = Route::match($destination['methods'], $destination['uri'], $destination['action']);
+
+        if ($destination['fallback']) {
+            $route->fallback();
+        }
+
+        return $route;
     }
 
 }
