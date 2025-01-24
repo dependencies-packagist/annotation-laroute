@@ -28,8 +28,30 @@ class PendingRoute implements PendingRouteContract
         return $this;
     }
 
+    /**
+     * Determines whether application routes are registered.
+     *
+     * @return bool
+     */
+    public function shouldRegisterRoutes(): bool
+    {
+        if (!config('routing.enabled')) {
+            return false;
+        }
+
+        if (app()->routesAreCached()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function discover(Closure $callback = null): static
     {
+        if (!$this->shouldRegisterRoutes()) {
+            return $this;
+        }
+
         if (app()->scannedRoutesAreCached()) {
             app()->booted(function ($app) {
                 require $app->getCachedScannedRoutesPath();
@@ -37,12 +59,12 @@ class PendingRoute implements PendingRouteContract
             return $this;
         }
 
-        return $this->pipe($callback)->handle(fn(array $options) => $this->sendScannedThroughRouter($options));
+        return $this->pipe($callback)->handle(fn(array $options) => $this->sendThroughRouter($options));
     }
 
     public function getRoutes(): Collection
     {
-        return $this->route->loadScannedRoutes()->getRoutes();
+        return $this->route->getRoutes();
     }
 
     protected function handle(Closure $callback)
@@ -50,7 +72,7 @@ class PendingRoute implements PendingRouteContract
         return tap($this, fn() => $this->getRoutes()->map($callback));
     }
 
-    protected function sendScannedThroughRouter(array $options)
+    protected function sendThroughRouter(array $options)
     {
         return $this->pipeline->send($options)
             ->through($this->pipes)

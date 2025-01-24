@@ -13,7 +13,6 @@ use Symfony\Component\Finder\Finder;
 
 class RouteRegistrar implements RouteRegistrarContract
 {
-    protected Collection $scannedRoutes;
     protected Collection $directories;
     protected array      $middleware = [];
 
@@ -28,35 +27,13 @@ class RouteRegistrar implements RouteRegistrarContract
     }
 
     /**
-     * Determines whether application routes are registered.
+     * Get Scanned Routes
      *
-     * @return bool
+     * @return Collection
      */
-    public function shouldRegisterRoutes(): bool
+    public function getRoutes(): Collection
     {
-        if (!config('routing.enabled')) {
-            return false;
-        }
-
-        if (app()->routesAreCached()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Load the cached routes for the application.
-     *
-     * @return static
-     */
-    public function loadScannedRoutes(): static
-    {
-        if (!$this->shouldRegisterRoutes()) {
-            return $this;
-        }
-
-        $this->scannedRoutes = $this->directories->flatMap(function (array $directories) {
+        return $this->directories->flatMap(function (array $directories) {
             ['path' => $path, 'options' => $options] = $directories;
             $attributes = Arr::except($options, ['only', 'except']);
             $only       = $options['only'] ?? [];
@@ -67,8 +44,6 @@ class RouteRegistrar implements RouteRegistrarContract
             });
             return collect($files)->values()->flatMap(fn(SplFileInfo $file) => $this->resolving($file, $path, $attributes))->filter();
         })->filter();
-
-        return $this;
     }
 
     /**
@@ -101,16 +76,6 @@ class RouteRegistrar implements RouteRegistrarContract
         );
 
         return $route->getRoutes();
-    }
-
-    /**
-     * Get Scanned Routes
-     *
-     * @return Collection
-     */
-    public function getRoutes(): Collection
-    {
-        return $this->scannedRoutes;
     }
 
     /**

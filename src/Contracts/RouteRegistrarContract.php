@@ -7,20 +7,6 @@ use Illuminate\Support\Collection;
 interface RouteRegistrarContract
 {
     /**
-     * Determines whether application routes are registered.
-     *
-     * @return bool
-     */
-    public function shouldRegisterRoutes(): bool;
-
-    /**
-     * Load the cached routes for the application.
-     *
-     * @return static
-     */
-    public function loadScannedRoutes(): static;
-
-    /**
      * Get Scanned Routes
      *
      * @return Collection
