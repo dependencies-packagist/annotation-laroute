@@ -185,32 +185,44 @@ class ReflectionAnnotation
     {
         return collect($this->reflectionClass->getDeclaredMethods(ReflectionMethod::IS_PUBLIC))
             ->mapWithKeys(function (ReflectionMethod $method) {
-                $name = "{$this->getAttribute('as')}.{$this->getUri()}.{$method->getName()}";
-                return [
-                    $name => [
-                        'methods'       => $this->getDefaultMethods(),
-                        'uri'           => $method->getName(),
-                        'action'        => [
-                            'middleware' => array_merge($this->getAttribute('middleware', []), $this->getMiddleware()),
-                            'domain'     => $this->getAttribute('domain'),
-                            'uses'       => "{$method->getDeclaringClass()->getName()}@{$method->getName()}",
-                            'controller' => "{$method->getDeclaringClass()->getName()}@{$method->getName()}",
-                            'as'         => $name,
-                            'namespace'  => $method->getDeclaringClass()->getNamespaceName(),
-                            'prefix'     => trim("{$this->getAttribute('prefix')}/{$this->getUri()}", '/'),
-                            'where'      => [],
-                        ],
-                        'fallback'      => false,
-                        'defaults'      => [],
-                        'wheres'        => [],
-                        'bindingFields' => [],
-                        'lockSeconds'   => null,
-                        'waitSeconds'   => null,
-                        'withTrashed'   => false,
-                    ],
-                ];
+                return [$this->getRouteName($method) => $this->getRoute($method)];
             })
             ->all();
+    }
+
+    private function getRouteName(ReflectionMethod $method): string
+    {
+        return "{$this->getAttribute('as')}.{$this->getUri()}.{$method->getName()}";
+    }
+
+    private function getRoute(ReflectionMethod $method): array
+    {
+        return [
+            'methods'       => $this->getDefaultMethods(),
+            'uri'           => $method->getName(),
+            'action'        => $this->getAction($method),
+            'fallback'      => false,
+            'defaults'      => [],
+            'wheres'        => [],
+            'bindingFields' => [],
+            'lockSeconds'   => null,
+            'waitSeconds'   => null,
+            'withTrashed'   => false,
+        ];
+    }
+
+    private function getAction(ReflectionMethod $method): array
+    {
+        return [
+            'middleware' => array_merge($this->getAttribute('middleware', []), $this->getMiddleware()),
+            'domain'     => $this->getAttribute('domain'),
+            'uses'       => "{$method->getDeclaringClass()->getName()}@{$method->getName()}",
+            'controller' => "{$method->getDeclaringClass()->getName()}@{$method->getName()}",
+            'as'         => $this->getRouteName($method),
+            'namespace'  => $method->getDeclaringClass()->getNamespaceName(),
+            'prefix'     => trim("{$this->getAttribute('prefix')}/{$this->getUri()}", '/'),
+            'where'      => [],
+        ];
     }
 
     public function getDefaultMethods(): array
