@@ -16,11 +16,10 @@ interface RouteAttributeContract extends RequestMethods
      */
     public const ANY = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
-    public const whereNumber = '';
-    public const whereAlpha = '';
-    public const whereAlphaNumeric = '';
-    public const whereUuid = '';
-    public const whereUlid = '';
-    public const whereIn = '';
+    public const whereAlpha        = '[a-zA-Z]+';
+    public const whereAlphaNumeric = '[a-zA-Z0-9]+';
+    public const whereNumber       = '[0-9]+';
+    public const whereUuid         = '[0-7][0-9a-hjkmnp-tv-zA-HJKMNP-TV-Z]{25}';
+    public const whereUlid         = '[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}';
 
 }
