@@ -4,7 +4,7 @@ namespace Annotation\Routing\Attributes;
 
 use Annotation\Routing\Contracts\InvokeContract;
 
-class ResourceAttribute extends Route implements Contracts\RouteResourceAttributeContract
+abstract class ResourceAttribute extends Route implements Contracts\RouteResourceAttributeContract
 {
     protected array $resource = [];
 
