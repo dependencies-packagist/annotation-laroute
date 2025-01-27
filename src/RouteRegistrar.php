@@ -80,7 +80,7 @@ class RouteRegistrar implements RouteRegistrarContract
             middleware: $this->getMiddleware()
         );
 
-        return $route->getRoutes();
+        return $route->resolving()->getRoutes();
     }
 
     /**
