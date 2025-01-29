@@ -3,12 +3,11 @@
 namespace Annotation\Routing;
 
 use Annotation\Routing\Attributes\Contracts\RouteAttributeContract;
-use Annotation\Routing\Attributes\Contracts\RouteFallbackAttributeContract;
 use Annotation\Routing\Attributes\Contracts\RouteResourceAttributeContract;
-use Annotation\Routing\Attributes\ResourceAttribute;
 use Annotation\Routing\Attributes\Route;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionAttribute;
 use ReflectionMethod;
@@ -34,11 +33,11 @@ class ReflectionAnnotation
 
     /**
      * @param \ReflectionClass|ReflectionMethod $class
-     * @param                                   $name
+     * @param string|null                       $name
      *
      * @return Route[]
      */
-    protected function getRouteAttributes(\ReflectionClass|ReflectionMethod $class, $name): array
+    protected function getAttributesInstance(\ReflectionClass|ReflectionMethod $class, string $name = null): array
     {
         return array_map(
             fn(ReflectionAttribute $attribute) => $attribute->newInstance(),
@@ -46,29 +45,9 @@ class ReflectionAnnotation
         );
     }
 
-    private function resolvingResourceMethodAttributes(ReflectionAttribute $attribute): array
+    private function getParameters(ReflectionMethod $method): Collection
     {
-        $route = $attribute->newInstance();
-        return collect(with($route, fn(ResourceAttribute $route) => $route->getResourceMethods()))
-            ->map(function (string $method) use ($route) {
-                return new Route(
-                    methods: $route->getMethods($method),
-                    name: Str::kebab($route->getName($method)),
-                    uri: Str::kebab($method),
-                    action: $method,
-                    controller: $this->reflectionClass->getName(),
-                    namespace: $this->reflectionClass->getNamespaceName(),
-                    uses: "{$this->reflectionClass->getName()}@{$method}",
-                    prefix: "{$this->getPrefix()}/{$this->getUri()}",
-                );
-            })
-            ->all();
-    }
-
-    private function resolvingMethodAttributes(ReflectionMethod $method): array
-    {
-        $defaults = [];
-        $uri      = collect($method->getParameters())
+        return collect($method->getParameters())
             ->filter(fn(ReflectionParameter $parameter) => is_null($parameter->getType()) || $parameter->getType() instanceof ReflectionNamedType)
             ->filter(function (ReflectionParameter $parameter) {
                 if ($parameter->getType() instanceof ReflectionNamedType) {
@@ -77,84 +56,117 @@ class ReflectionAnnotation
                 return true;
             })
             ->reject(fn(ReflectionParameter $parameter) => is_a($parameter->getType()?->getName(), Request::class, true) || $parameter->isVariadic())
-            ->map(function (ReflectionParameter $parameter) use (&$defaults) {
-                if ($parameter->isDefaultValueAvailable()) {
-                    $defaults[$parameter->getName()] = $parameter->getDefaultValue();
-                }
-                return sprintf($parameter->isOptional() ? '{%s?}' : '{%s}', $parameter->getName());
-            })
-            ->implode('/');
-        return [
-            new Route(
-                name: Str::kebab($method->getName()),
-                uri: $uri ?: Str::kebab($method->getName()),
-                action: $method->getName(),
-                controller: $method->getDeclaringClass()->getName(),
-                namespace: $method->getDeclaringClass()->getNamespaceName(),
-                uses: "{$method->getDeclaringClass()->getName()}@{$method->getName()}",
-                prefix: "{$this->getPrefix()}/{$this->getUri()}",
-                defaults: $defaults
-            ),
-        ];
-    }
-
-    private function resolvingRootAttributes(): array
-    {
-        return [
-            $this->getNamespace() => new Route(
-                name: Str::replace('\\', '', $this->getPrefix()),
-                prefix: $this->getPrefix(),
-            ),
-            $this->getClassName() => new Route(
-                name: $this->getUri(),
-                controller: $this->getClassName(),
-                namespace: $this->getNamespace(),
-                prefix: $this->getUri(),
-            ),
-        ];
-    }
-
-    protected function getResourceMethodAttributes(): array
-    {
-        return collect($this->reflectionClass->getAttributes(RouteResourceAttributeContract::class, ReflectionAttribute::IS_INSTANCEOF))
-            ->mapWithKeys(function (ReflectionAttribute $attribute) {
-                return $this->resolvingResourceMethodAttributes($attribute);
-            })
-            ->all();
-    }
-
-    protected function getMethodAttributes(): array
-    {
-        return collect($this->reflectionClass->getDeclaredMethods(ReflectionMethod::IS_PUBLIC))
-            ->mapWithKeys(function (ReflectionMethod $method) {
-                $attributes = $this->getRouteAttributes($method, RouteAttributeContract::class);
+            ->mapWithKeys(function (ReflectionParameter $parameter) {
+                $name        = $parameter->getName();
+                $isAvailable = $parameter->isDefaultValueAvailable();
+                $key         = $parameter->isOptional() ? "{{$name}?}" : "{{$name}}";
                 return [
-                    $method->getName() => count($attributes) ? $attributes : $this->resolvingMethodAttributes($method),
+                    $key => $isAvailable ? [$name => $parameter->getDefaultValue()] : [],
+                ];
+            });
+    }
+
+    private function prependParentRoute(array $routes): array
+    {
+        array_unshift($routes, new Route(
+            methods: $this->getAttribute('methods', $this->getDefaultMethods()),
+            name: $this->getAttribute('as', $this->getPrefix()),
+            controller: $this->getClassName(),
+            namespace: $this->getNamespace(),
+            prefix: $this->getAttribute('prefix', $this->getPrefix()),
+            domain: $this->getAttribute('domain'),
+        ));
+        return $routes;
+    }
+
+    private function prependCurrentRoute(array $routes): array
+    {
+        array_unshift($routes, new Route(
+            name: $this->getUri(),
+            prefix: $this->getUri(),
+        ));
+        return $routes;
+    }
+
+    private function prependMethodRoute(array $routes, ReflectionMethod $method): array
+    {
+        $name      = $method->getName();
+        $parameter = $this->getParameters($method);
+        array_unshift($routes, new Route(
+            name: Str::kebab($name),
+            uri: trim(Str::kebab($name) . '/' . $parameter->keys()->implode('/'), '/'),
+            action: $name,
+            wheres: $parameter->values()->flatMap(fn($v) => $v)->all(),
+        ));
+        return $routes;
+    }
+
+    protected function getResourceMethodAttributes(): static
+    {
+        $methods            = array_map(
+            fn(ReflectionMethod $method) => $method->getName(),
+            $this->reflectionClass->getDeclaredMethods(ReflectionMethod::IS_PUBLIC)
+        );
+        $this->methodsStack = $this->methodsStack ?: collect($this->getAttributesInstance($this->reflectionClass, RouteResourceAttributeContract::class))
+            ->reduce(function (array $routes, RouteResourceAttributeContract $resource) use ($methods) {
+                $methods = array_intersect($resource->getResourceMethods(), $methods);
+                foreach ($methods as $method) {
+                    $routes[$method] = [
+                        new Route(
+                            methods: $resource->getMethods($method),
+                            name: $resource->getName($this->getUri(), $method),
+                            uri: $resource->getUri($this->getUri(), $method),
+                            action: $method,
+                            middleware: $resource->getMiddleware(),
+                            withoutMiddleware: $resource->getWithoutMiddleware(),
+                            defaults: $resource->getDefaults(),
+                            wheres: $resource->getWheres(),
+                            bindingFields: $resource->getBindingFields(),
+                            lockSeconds: $resource->getLockSeconds(),
+                            waitSeconds: $resource->getWaitSeconds(),
+                            withTrashed: $resource->isWithTrashed(),
+                        ),
+                    ];
+                }
+                return $routes;
+            }, []);
+        return $this;
+    }
+
+    protected function getMethodAttributes(): static
+    {
+        $this->methodsStack = $this->methodsStack ?: collect($this->reflectionClass->getDeclaredMethods(ReflectionMethod::IS_PUBLIC))
+            ->mapWithKeys(function (ReflectionMethod $method) {
+                $routes = $this->getAttributesInstance($method, RouteAttributeContract::class);
+                return [
+                    $method->getName() => $this->prependMethodRoute($routes, $method),
                 ];
             })
-            ->filter()
             ->all();
+        return $this;
     }
 
-    protected function getParentAttributes(): array
+    public function resolving(): static
     {
-        return collect($this->reflectionClass->getParentClasses())
-            ->map(fn(\ReflectionClass $class) => $this->getRouteAttributes($class, RouteAttributeContract::class))
-            ->filter()
-            ->all();
-    }
-
-    private function hasRootAttribute(): bool
-    {
-        return collect($this->reflectionClass->getAttributes(RouteAttributeContract::class, ReflectionAttribute::IS_INSTANCEOF))
-            ->reject(fn(\ReflectionAttribute $class) => is_subclass_of($class->getName(), RouteFallbackAttributeContract::class))
-            ->isNotEmpty();
-    }
-
-    protected function bootstrap(): static
-    {
-        $this->parentsStack = $this->hasRootAttribute() ? $this->getParentAttributes() : $this->resolvingRootAttributes();
-        $this->methodsStack = $this->getResourceMethodAttributes() ?: $this->getMethodAttributes();
+        $parentsStack       = collect($this->reflectionClass->getParentClasses());
+        $this->parentsStack = with($parentsStack, function (Collection $collection) {
+            return $collection
+                ->transform(function (\ReflectionClass $class) {
+                    return $this->getAttributesInstance($class, RouteAttributeContract::class);
+                })
+                ->map(function (array $routes, string $className) use ($collection) {
+                    if ($className === $collection->keys()->first()) {
+                        return $this->getResourceMethodAttributes()->getMethodAttributes()->prependCurrentRoute($routes);
+                    }
+                    if ($className === $collection->keys()->last()) {
+                        return $this->prependParentRoute($routes);
+                    }
+                    return $routes;
+                })
+                ->reverse()
+                ->filter()
+                ->all();
+        });
         return $this;
     }
 
@@ -168,17 +180,6 @@ class ReflectionAnnotation
             'as'         => $this->getAttribute('as', Str::replace('\\', '.', $this->getPrefix())),
             'middleware' => array_merge($middleware, $this->getMiddleware()),
         ];
-    }
-
-    public function wip2(): array
-    {
-        return [
-            'controller' => $this->getClassName(),
-            'namespace'  => $this->getNamespace(),
-            'prefix'     => $this->getUri(),
-            'as'         => $this->getUri(),
-        ];
-
     }
 
     public function getRoutes(): array
@@ -227,7 +228,7 @@ class ReflectionAnnotation
 
     public function getDefaultMethods(): array
     {
-        return config('routing.default_methods', Route::GET);
+        return config('routing.default_methods', RouteAttributeContract::GET);
     }
 
     /**
@@ -238,6 +239,22 @@ class ReflectionAnnotation
     protected function generateRouteName(): string
     {
         return 'generated::' . Str::random();
+    }
+
+    /**
+     * @return array
+     */
+    public function getMethodsStack(): array
+    {
+        return $this->methodsStack;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParentsStack(): array
+    {
+        return $this->parentsStack;
     }
 
     /**
@@ -308,8 +325,8 @@ class ReflectionAnnotation
         $value = $this->attributes[$attribute] ?? $default;
         return match ($attribute) {
             'middleware', 'methods' => is_array($value) ? $value : [$value],
-            'prefix' => $this->getAttribute('domain') ? '' : (trim($value, '/') ?: $this->getPrefix()),
-            'as', 'name' => trim($value, '.') ?: Str::replace('/', '.', $this->getPrefix()),
+            'prefix' => $this->getAttribute('domain') ? '' : trim($value ?: $this->getPrefix(), '/'),
+            'as', 'name' => trim(Str::replace('/', '.', $value ?: $this->getPrefix()), '.'),
             default => $value
         };
     }
