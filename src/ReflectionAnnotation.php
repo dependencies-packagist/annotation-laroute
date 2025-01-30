@@ -83,6 +83,8 @@ class ReflectionAnnotation
     {
         array_unshift($routes, new Route(
             name: $this->getUri(),
+            controller: $this->getClassName(),
+            namespace: $this->getNamespace(),
             prefix: $this->getUri(),
         ));
         return $routes;
@@ -96,6 +98,8 @@ class ReflectionAnnotation
             name: Str::kebab($name),
             uri: trim(Str::kebab($name) . '/' . $parameter->keys()->implode('/'), '/'),
             action: $name,
+            controller: $this->getClassName(),
+            namespace: $this->getNamespace(),
             wheres: $parameter->values()->flatMap(fn($v) => $v)->all(),
         ));
         return $routes;
@@ -117,6 +121,8 @@ class ReflectionAnnotation
                             name: $resource->getName($this->getUri(), $method),
                             uri: $resource->getUri($this->getUri(), $method),
                             action: $method,
+                            controller: $this->getClassName(),
+                            namespace: $this->getNamespace(),
                             middleware: $resource->getMiddleware(),
                             withoutMiddleware: $resource->getWithoutMiddleware(),
                             defaults: $resource->getDefaults(),
