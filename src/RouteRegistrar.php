@@ -73,7 +73,7 @@ class RouteRegistrar implements RouteRegistrarContract
         }
 
         $route = new ReflectionAnnotation(
-            uri: $this->getUri($reflection->getName()),
+            uri: $this->getUri($reflection->getShortName()),
             prefix: $this->getPrefix($reflection->getNamespaceName()),
             reflectionClass: $reflection,
             attributes: $attributes,
@@ -99,9 +99,9 @@ class RouteRegistrar implements RouteRegistrarContract
         ), DIRECTORY_SEPARATOR);
     }
 
-    protected function getUri(string $namespace): string
+    protected function getUri(string $className): string
     {
-        return Str::of(basename($namespace))
+        return Str::of($className)
             ->replaceLast('Controller', '')
             ->kebab()
             ->toString();
