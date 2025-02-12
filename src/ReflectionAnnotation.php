@@ -176,20 +176,21 @@ class ReflectionAnnotation
         return $this;
     }
 
-    // public function wip1(): array
-    // {
-    //     $middleware = $this->getAttribute('middleware', []);
-    //     return [
-    //         'methods'    => $this->getAttribute('methods', $this->getDefaultMethods()),
-    //         'domain'     => $this->getAttribute('domain'),
-    //         'prefix'     => $this->getAttribute('prefix', $this->getPrefix()),
-    //         'as'         => $this->getAttribute('as', Str::replace('\\', '.', $this->getPrefix())),
-    //         'middleware' => array_merge($middleware, $this->getMiddleware()),
-    //     ];
-    // }
+    public function wip1(): array
+    {
+        $middleware = $this->getAttribute('middleware', []);
+        return [
+            'methods'    => $this->getAttribute('methods', $this->getDefaultMethods()),
+            'domain'     => $this->getAttribute('domain'),
+            'prefix'     => $this->getAttribute('prefix', $this->getPrefix()),
+            'as'         => $this->getAttribute('as', Str::replace('\\', '.', $this->getPrefix())),
+            'middleware' => array_merge($middleware, $this->getMiddleware()),
+        ];
+    }
 
     public function getRoutes(): array
     {
+        // dd($this);
         return collect($this->reflectionClass->getDeclaredMethods(ReflectionMethod::IS_PUBLIC))
             ->mapWithKeys(function (ReflectionMethod $method) {
                 return [$this->getRouteName($method) => $this->getRoute($method)];
