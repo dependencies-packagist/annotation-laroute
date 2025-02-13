@@ -190,7 +190,6 @@ class ReflectionAnnotation
 
     public function getRoutes(): array
     {
-        dd($this);
         return collect($this->reflectionClass->getDeclaredMethods(ReflectionMethod::IS_PUBLIC))
             ->mapWithKeys(function (ReflectionMethod $method) {
                 return [$this->getRouteName($method) => $this->getRoute($method)];
