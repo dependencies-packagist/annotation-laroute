@@ -1,0 +1,32 @@
+{
+    "name": "annotation/laroute",
+    "description": "Auto register routes using PHP attributes for Laravel.",
+    "keywords": [
+        "Annotation",
+        "annotation",
+        "Laroute",
+        "laroute"
+    ],
+    "type": "metapackage",
+    "license": "MIT",
+    "homepage": "https://github.com/dependencies-packagist/annotation-laroute",
+    "authors": [
+        {
+            "name": "jundayw",
+            "email": "jundayw@126.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
