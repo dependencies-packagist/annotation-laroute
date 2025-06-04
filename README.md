@@ -31,7 +31,7 @@ Contributions are what make the open source community such an amazing place to l
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
 
-1. Fork the [annotation/routing]
+1. Fork the [annotation/routing](https://github.com/dependencies-packagist/routing)
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
@@ -45,8 +45,8 @@ Don't forget to give the project a star! Thanks again!
 
 Thanks goes to these wonderful people:
 
-<a href="https://github.com/dependencies-packagist/annotation-routing/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=dependencies-packagist/annotation-routing" alt="contrib.rocks image" />
+<a href="https://github.com/dependencies-packagist/routing/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=dependencies-packagist/routing" alt="contrib.rocks image" />
 </a>
 
 Contributions of any kind are welcome!
@@ -71,16 +71,12 @@ Distributed under the MIT License (MIT). Please see [License File] for more info
 
 [Packagist License]: https://img.shields.io/github/license/dependencies-packagist/annotation-laroute
 
+[GitHub Tag URL]: https://github.com/dependencies-packagist/annotation-laroute/tagsv
+
 [Packagist URL]: https://packagist.org/packages/annotation/laroute
 
 [Repository URL]: https://github.com/dependencies-packagist/annotation-laroute
 
-[GitHub Open Issues]: https://github.com/dependencies-packagist/annotation-laroute/issues
-
-[GitHub Tag URL]: https://github.com/dependencies-packagist/annotation-laroute/tagsv
-
-[annotation/routing]: https://github.com/dependencies-packagist/routing
+[Composer]: https://getcomposer.org
 
 [License File]: https://github.com/dependencies-packagist/annotation-laroute/blob/main/LICENSE
-
-[Composer]: https://getcomposer.org
