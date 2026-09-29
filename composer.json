@@ -1,5 +1,6 @@
 {
     "name": "annotation/laroute",
+    "version": "3.0.0",
     "description": "Auto register routes using PHP attributes for Laravel.",
     "keywords": [
         "Annotation",
@@ -12,21 +13,27 @@
     "homepage": "https://github.com/dependencies-packagist/annotation-laroute",
     "authors": [
         {
-            "name": "jundayw",
+            "name": "Mr.Moore",
             "email": "jundayw@126.com"
         }
     ],
     "require": {
         "php": "^8.0",
-        "annotation/routing": "^2.0"
+        "annotation/routing": "^3.0"
+    },
+    "require-dev": {
+        "jundayw/composer-version-plugin": "^1.0"
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "2.x-dev"
+            "dev-main": "3.x-dev"
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "jundayw/composer-version-plugin": true
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true
